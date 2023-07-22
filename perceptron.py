@@ -12,7 +12,7 @@ class Perceptron:
 
     # This step function returns 1 where x > 0 and return 0 otherwise:
     def unit_step_activation(self, x):
-        return np.where(x >= 0, 1, 0)
+        return np.where(x >= 1, 1, 0)
 
     # do the prediction
     def predict_function(self, X, weight_j = 0):
@@ -29,7 +29,7 @@ class Perceptron:
         return y_predicted
 
     # define fit method with x and y
-    def train(self, X, y):
+    def train(self, X, train_vector):
         # X is a 2d array size m*n where m=num of rows(samples), n=cols(features)
         samples, features = X.shape  # initializing number of samples and number of features
 
@@ -40,52 +40,35 @@ class Perceptron:
             # clean as matrix for printing
             y_print = np.array([1 if i > 0 else 0 for i in self.weights[i]])
             print(y_print, " ----> weight", i+1)
-        self.bias = 0
 
-
-
-        y_ = np.array([1 if i > 0 else 0 for i in y]) # make sure nothing passes that is not 1's and 0's as training values
+        y_ = np.array([1 if i > 0 else 0 for i in train_vector]) # make sure nothing passes that is not 1's and 0's as training values
 
         # # start training
-        # for epoch in range(self.epochs):
-        #     for index_, current_sample in enumerate(X):
-        #         linear_output = np.dot(current_sample, self.weights) + self.bias
-        #         predicted_y = self.activation_func
-
-        #         update = self.learning_r * (y_[index_] - predicted_y)
-        #         self.weights += update * current_sample
-
-        #         self.bias += update
-    
-    # define fit method with x and y
-    def perfomance_test(self, X, y):
-        # X is a 2d array size m*n where m=num of rows(samples), n=cols(features)
-        samples, features = X.shape  # initializing number of samples and number of features
-
-        # initialize the weights
-        self.weights = np.zeros(features)
-        self.bias = 0
-
-
-        y_ = np.array([1 if i > 0 else 0 for i in y])
-
-        # start training
         for epoch in range(self.epochs):
+            print("training at epoch ........", epoch)
+            print("About to dot the sample with all the weights and modify the weights: ")
+            print("*********************************************")
             for index_, current_sample in enumerate(X):
-                linear_output = np.dot(current_sample, self.weights) + self.bias
-                predicted_y = self.activation_func
-
-                update = self.learning_r * (y_[index_] - predicted_y)
-                self.weights += update * current_sample
-
-                self.bias += update
+                print("For the first sample: there are", self.number_outputs, "outputs")
+                for index_w, weight in enumerate(self.weights):
+                    predicted_y = self.predict_function(current_sample, index_)
+                    update = float(self.learning_r * (y_[index_] - predicted_y))
+                    print("For weight", weight, ", the update to be made is", update, " as t - y =", y_[index_] - predicted_y)
+                    # making changes to the weights:
+                    print(" ")
+                    print("     The changes are made on each of the weights as follows:")
+                    for index, value in enumerate(current_sample):
+                        if(value == 0):
+                            print("The x at this point is 0 and thus didn't contribute to any weight change: Pass")
+                        else:
+                            prev = weight[index]
+                            weight[index] += (value * update)
+                            print("This weight at" , index, index_w, "has changed from", prev, "to", weight[index])
 
     
-
 # Create example:
-my_perceptron = Perceptron(4, 0.1, 100)
-my_perceptron.weights = [[1,1,1]]
-a = my_perceptron.predict_function([1,1,1])
+my_perceptron = Perceptron(4, 0.1, 3)
+#my_perceptron.weights = [[1,1,1]]
+#a = my_perceptron.predict_function([1,1,1])
 X = np.array([[1,1,1]])
-my_perceptron.train(X,[1])
-print("Done running", a)
+my_perceptron.train(X,[1, 0, 1, 1])
